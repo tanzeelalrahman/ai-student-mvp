@@ -1,29 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import styles from "./page.module.css";
 
 function ProgressBar({ value }: { value: number }) {
   return (
-    <div style={{ marginTop: 12 }}>
-      <div
-        style={{
-          height: 10,
-          borderRadius: 999,
-          border: "1px solid #3333",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            height: "100%",
-            width: `${value}%`,
-            background: "currentColor",
-            opacity: 0.25,
-          }}
-        />
+    <div className={styles.progressWrap}>
+      <div className={styles.progressTrack}>
+        <div className={styles.progressFill} style={{ width: `${value}%` }} />
       </div>
-      <div style={{ marginTop: 6, fontSize: 12, opacity: 0.75 }}>
+      <div className={styles.progressLabel}>
         {value}% complete
       </div>
     </div>
@@ -73,8 +61,6 @@ const STEPS = [
   "specificCourse",
   "result",
 ] as const;
-
-type StepId = (typeof STEPS)[number];
 
 function isValidPhone(input: string) {
   const cleaned = input.replace(/[^\d+]/g, "");
@@ -295,44 +281,44 @@ export default function ProfilePage() {
   }
 
   return (
-    <main style={{ maxWidth: 720, margin: "0 auto", padding: "32px 16px" }}>
-      <h1 style={{ fontSize: 28, fontWeight: 700 }}>Student Profiling</h1>
-      <p style={{ opacity: 0.8, marginTop: 8 }}>
-        Step {stepIndex + 1} of {STEPS.length}
-      </p>
-      <ProgressBar value={percent} />
+    <main className={styles.page}>
+      <div className={styles.shell}>
+        <div className={styles.topBar}>
+          <div className={styles.badge}>Student Profile Flow</div>
+          <div className={styles.links}>
+            <Link href="/" className={styles.linkBtn}>
+              Home
+            </Link>
+            <Link href="/crm" className={styles.linkBtn}>
+              CRM
+            </Link>
+          </div>
+        </div>
 
-      <div
-        style={{
-          marginTop: 24,
-          padding: 16,
-          border: "1px solid #3333",
-          borderRadius: 12,
-        }}
-      >
+        <h1 className={styles.title}>Student Profiling</h1>
+        <p className={styles.subtitle}>
+          Step {stepIndex + 1} of {STEPS.length}
+        </p>
+        <ProgressBar value={percent} />
+
+        <div className={styles.panel}>
         {step === "name" && (
           <>
-            <h2 style={{ fontSize: 18, fontWeight: 600 }}>What’s your name?</h2>
+            <h2 className={styles.stepTitle}>What’s your name?</h2>
             <input
               value={profile.name}
               onChange={(e) =>
                 setProfile((p) => ({ ...p, name: e.target.value }))
               }
               placeholder="e.g., Tanzeel"
-              style={{
-                width: "100%",
-                marginTop: 12,
-                padding: 12,
-                borderRadius: 10,
-                border: "1px solid #3333",
-              }}
+              className={styles.field}
             />
           </>
         )}
 
         {step === "phone" && (
           <>
-            <h2 style={{ fontSize: 18, fontWeight: 600 }}>
+            <h2 className={styles.stepTitle}>
               Phone number (optional)
             </h2>
             <input
@@ -341,20 +327,14 @@ export default function ProfilePage() {
                 setProfile((p) => ({ ...p, phone: e.target.value }))
               }
               placeholder="e.g., +1 555 123 4567 (or leave blank)"
-              style={{
-                width: "100%",
-                marginTop: 12,
-                padding: 12,
-                borderRadius: 10,
-                border: "1px solid #3333",
-              }}
+              className={styles.field}
             />
           </>
         )}
 
         {step === "education" && (
           <>
-            <h2 style={{ fontSize: 18, fontWeight: 600 }}>Education level</h2>
+            <h2 className={styles.stepTitle}>Education level</h2>
             <select
               value={profile.educationLevel ?? ""}
               onChange={(e) =>
@@ -363,13 +343,7 @@ export default function ProfilePage() {
                   educationLevel: e.target.value as EducationLevel,
                 }))
               }
-              style={{
-                width: "100%",
-                marginTop: 12,
-                padding: 12,
-                borderRadius: 10,
-                border: "1px solid #3333",
-              }}
+              className={styles.field}
             >
               <option value="" disabled>
                 Select one
@@ -384,7 +358,7 @@ export default function ProfilePage() {
 
         {step === "status" && (
           <>
-            <h2 style={{ fontSize: 18, fontWeight: 600 }}>Current status</h2>
+            <h2 className={styles.stepTitle}>Current status</h2>
             <select
               value={profile.currentStatus ?? ""}
               onChange={(e) =>
@@ -393,13 +367,7 @@ export default function ProfilePage() {
                   currentStatus: e.target.value as CurrentStatus,
                 }))
               }
-              style={{
-                width: "100%",
-                marginTop: 12,
-                padding: 12,
-                borderRadius: 10,
-                border: "1px solid #3333",
-              }}
+              className={styles.field}
             >
               <option value="" disabled>
                 Select one
@@ -413,7 +381,7 @@ export default function ProfilePage() {
 
         {step === "domain" && (
           <>
-            <h2 style={{ fontSize: 18, fontWeight: 600 }}>Interest domain</h2>
+            <h2 className={styles.stepTitle}>Interest domain</h2>
             <select
               value={profile.interestDomain ?? ""}
               onChange={(e) =>
@@ -422,13 +390,7 @@ export default function ProfilePage() {
                   interestDomain: e.target.value as InterestDomain,
                 }))
               }
-              style={{
-                width: "100%",
-                marginTop: 12,
-                padding: 12,
-                borderRadius: 10,
-                border: "1px solid #3333",
-              }}
+              className={styles.field}
             >
               <option value="" disabled>
                 Select one
@@ -446,7 +408,7 @@ export default function ProfilePage() {
 
         {step === "goal" && (
           <>
-            <h2 style={{ fontSize: 18, fontWeight: 600 }}>Career goal</h2>
+            <h2 className={styles.stepTitle}>Career goal</h2>
             <select
               value={profile.careerGoal ?? ""}
               onChange={(e) =>
@@ -455,13 +417,7 @@ export default function ProfilePage() {
                   careerGoal: e.target.value as CareerGoal,
                 }))
               }
-              style={{
-                width: "100%",
-                marginTop: 12,
-                padding: 12,
-                borderRadius: 10,
-                border: "1px solid #3333",
-              }}
+              className={styles.field}
             >
               <option value="" disabled>
                 Select one
@@ -476,7 +432,7 @@ export default function ProfilePage() {
 
         {step === "budget" && (
           <>
-            <h2 style={{ fontSize: 18, fontWeight: 600 }}>Budget range</h2>
+            <h2 className={styles.stepTitle}>Budget range</h2>
             <select
               value={profile.budgetRange ?? ""}
               onChange={(e) =>
@@ -485,13 +441,7 @@ export default function ProfilePage() {
                   budgetRange: e.target.value as BudgetRange,
                 }))
               }
-              style={{
-                width: "100%",
-                marginTop: 12,
-                padding: 12,
-                borderRadius: 10,
-                border: "1px solid #3333",
-              }}
+              className={styles.field}
             >
               <option value="" disabled>
                 Select one
@@ -506,7 +456,7 @@ export default function ProfilePage() {
 
         {step === "specificCourse" && (
           <>
-            <h2 style={{ fontSize: 18, fontWeight: 600 }}>
+            <h2 className={styles.stepTitle}>
               Any specific course you’re considering?
             </h2>
             <input
@@ -515,15 +465,9 @@ export default function ProfilePage() {
                 setProfile((p) => ({ ...p, specificCourse: e.target.value }))
               }
               placeholder="e.g., 'Google Data Analytics' (optional)"
-              style={{
-                width: "100%",
-                marginTop: 12,
-                padding: 12,
-                borderRadius: 10,
-                border: "1px solid #3333",
-              }}
+              className={styles.field}
             />
-            <p style={{ marginTop: 10, opacity: 0.8 }}>
+            <p className={styles.hint}>
               Optional — if you leave this blank we’ll recommend based on your
               answers.
             </p>
@@ -532,51 +476,33 @@ export default function ProfilePage() {
 
         {step === "result" && (
           <>
-            <h2 style={{ fontSize: 18, fontWeight: 600 }}>
+            <h2 className={styles.stepTitle}>
               Your Recommendation
             </h2>
 
-            <div
-              style={{
-                marginTop: 12,
-                padding: 14,
-                border: "1px solid #3333",
-                borderRadius: 12,
-              }}
-            >
-              <div style={{ fontSize: 18, fontWeight: 700 }}>{program.title}</div>
-              <div style={{ marginTop: 8, opacity: 0.9 }}>{program.why}</div>
-              <div style={{ marginTop: 10, opacity: 0.8 }}>
+            <div className={styles.resultCard}>
+              <div className={styles.resultTitle}>{program.title}</div>
+              <div className={styles.resultWhy}>{program.why}</div>
+              <div className={styles.meta}>
                 <div>Duration: {program.duration}</div>
                 <div>Budget fit: {program.priceBand}</div>
               </div>
             </div>
 
             {/* Save to Supabase */}
-            <div
-              style={{
-                marginTop: 14,
-                display: "flex",
-                gap: 12,
-                alignItems: "center",
-                flexWrap: "wrap",
-              }}
-            >
+            <div className={styles.saveRow}>
               <button
                 onClick={saveToSupabase}
                 disabled={saving || !!savedIds}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: 10,
-                  border: "1px solid #3333",
-                  opacity: saving || !!savedIds ? 0.6 : 1,
-                }}
+                className={`${styles.btnPrimary} ${
+                  saving || !!savedIds ? styles.disabled : ""
+                }`}
               >
                 {savedIds ? "Saved ✓" : saving ? "Saving..." : "Save to Supabase"}
               </button>
 
               {savedIds && (
-                <span style={{ fontSize: 12, opacity: 0.8 }}>
+                <span className={styles.metaSmall}>
                   profileId: {savedIds.profileId.slice(0, 8)}… | recId:{" "}
                   {savedIds.recommendationId.slice(0, 8)}…
                 </span>
@@ -584,41 +510,28 @@ export default function ProfilePage() {
             </div>
 
             {saveError && (
-              <p style={{ marginTop: 10, color: "#ff6b6b" }}>{saveError}</p>
+              <p className={styles.error}>{saveError}</p>
             )}
 
-            <h3 style={{ marginTop: 16, fontSize: 16, fontWeight: 700 }}>
+            <h3 className={styles.answersTitle}>
               Your answers
             </h3>
-            <pre
-              style={{
-                marginTop: 8,
-                padding: 12,
-                borderRadius: 12,
-                background: "#111",
-                overflow: "auto",
-              }}
-            >
+            <pre className={styles.jsonBox}>
               {JSON.stringify(profile, null, 2)}
             </pre>
           </>
         )}
-      </div>
+        </div>
 
       {gate.reason && step !== "result" && (
-        <p style={{ marginTop: 10, color: "#ff6b6b" }}>{gate.reason}</p>
+        <p className={styles.error}>{gate.reason}</p>
       )}
 
-      <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+      <div className={styles.actions}>
         <button
           onClick={back}
           disabled={stepIndex === 0}
-          style={{
-            padding: "10px 14px",
-            borderRadius: 10,
-            border: "1px solid #3333",
-            opacity: stepIndex === 0 ? 0.5 : 1,
-          }}
+          className={`${styles.btn} ${stepIndex === 0 ? styles.disabled : ""}`}
         >
           Back
         </button>
@@ -629,11 +542,7 @@ export default function ProfilePage() {
               const g = canGoNext();
               if (g.ok) next();
             }}
-            style={{
-              padding: "10px 14px",
-              borderRadius: 10,
-              border: "1px solid #3333",
-            }}
+            className={styles.btnPrimary}
           >
             Next
           </button>
@@ -646,15 +555,12 @@ export default function ProfilePage() {
               setStepIndex(0);
               setProfile({ name: "", phone: "", specificCourse: "" });
             }}
-            style={{
-              padding: "10px 14px",
-              borderRadius: 10,
-              border: "1px solid #3333",
-            }}
+            className={styles.btn}
           >
             Start over
           </button>
         )}
+      </div>
       </div>
     </main>
   );

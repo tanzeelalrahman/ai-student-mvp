@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -38,8 +39,12 @@ type JobPostingRow = {
   created_at: string | null;
 };
 
+type ScoredJob = JobPostingRow & {
+  jobScore: number;
+};
+
 type RankedMatch = {
-  job: JobPostingRow;
+  job: ScoredJob;
   score: number;
   reasons: string[];
 };
@@ -47,6 +52,7 @@ type RankedMatch = {
 type LeadView = {
   profile: ProfileRow;
   recommendationTitle: string | null;
+  leadScore: number;
   matches: RankedMatch[];
 };
 
@@ -60,9 +66,9 @@ const DOMAIN_LABELS: Record<string, string> = {
   other: "Other",
 };
 
-const FALLBACK_JOBS: JobPostingRow[] = [
+const BASELINE_JOBS: JobPostingRow[] = [
   {
-    id: "mock-1",
+    id: "baseline-1",
     title: "Junior Frontend Developer",
     company: "Northstar Labs",
     domain: "web_dev",
@@ -76,7 +82,7 @@ const FALLBACK_JOBS: JobPostingRow[] = [
     created_at: null,
   },
   {
-    id: "mock-2",
+    id: "baseline-2",
     title: "Data Analyst (SQL)",
     company: "Insight Orbit",
     domain: "data_ai",
@@ -90,7 +96,7 @@ const FALLBACK_JOBS: JobPostingRow[] = [
     created_at: null,
   },
   {
-    id: "mock-3",
+    id: "baseline-3",
     title: "SOC Analyst I",
     company: "Sentinel Ridge",
     domain: "cybersecurity",
@@ -109,192 +115,184 @@ export default async function CrmPage() {
   const data = await loadCrmData();
   const totalLeads = data.leads.length;
   const totalJobs = data.jobs.length;
-  const matchedLeads = data.leads.filter((lead) => lead.matches.length > 0).length;
+  const matchedLeads = data.leads.filter((lead) => (lead.matches[0]?.score ?? 0) >= 40).length;
+  const avgLeadScore =
+    totalLeads > 0
+      ? Math.round(
+          data.leads.reduce((sum, lead) => sum + lead.leadScore, 0) / totalLeads
+        )
+      : 0;
+  const avgTopMatchScore =
+    totalLeads > 0
+      ? Math.round(
+          data.leads.reduce((sum, lead) => sum + (lead.matches[0]?.score ?? 0), 0) /
+            totalLeads
+        )
+      : 0;
 
   return (
-    <main style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 16px 48px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-        <div>
-          <h1 style={{ fontSize: 30, fontWeight: 700 }}>Student CRM</h1>
-          <p style={{ marginTop: 8, opacity: 0.82 }}>
-            Leads from Supabase profiles + ranked job matches from job postings.
-          </p>
+    <main className={styles.page}>
+      <div className={styles.shell}>
+        <div className={styles.top}>
+          <div>
+            <h1 className={styles.title}>Admissions CRM</h1>
+            <p className={styles.subtitle}>
+              Unified lead pipeline with profile quality scoring and role-fit ranking.
+            </p>
+          </div>
+          <div className={styles.actions}>
+            <Link href="/profile" className={styles.linkBtn}>
+              New Profile
+            </Link>
+            <Link href="/" className={styles.linkBtn}>
+              Home
+            </Link>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <Link
-            href="/profile"
-            style={{
-              padding: "10px 14px",
-              border: "1px solid #3333",
-              borderRadius: 10,
-              textDecoration: "none",
-            }}
-          >
-            New Profile
-          </Link>
-          <Link
-            href="/"
-            style={{
-              padding: "10px 14px",
-              border: "1px solid #3333",
-              borderRadius: 10,
-              textDecoration: "none",
-            }}
-          >
-            Home
-          </Link>
-        </div>
-      </div>
 
-      <section
-        style={{
-          marginTop: 18,
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-          gap: 12,
-        }}
-      >
-        <StatCard label="Total Leads" value={String(totalLeads)} />
-        <StatCard label="Active Jobs" value={String(totalJobs)} />
-        <StatCard label="Leads With Matches" value={String(matchedLeads)} />
-        <StatCard label="Job Source" value={data.jobSource} />
-      </section>
+        <section className={styles.stats}>
+          <StatCard label="Total Leads" value={String(totalLeads)} />
+          <StatCard label="Open Roles" value={String(totalJobs)} />
+          <StatCard label="Leads With Strong Match" value={String(matchedLeads)} />
+          <StatCard label="Average Lead Score" value={`${avgLeadScore}%`} />
+          <StatCard label="Average Top Match" value={`${avgTopMatchScore}%`} />
+        </section>
 
-      {data.warning && (
-        <p style={{ marginTop: 14, color: "#d08b00" }}>{data.warning}</p>
-      )}
+        {data.warning && <p className={styles.warning}>{data.warning}</p>}
 
-      <section style={{ marginTop: 20, border: "1px solid #3333", borderRadius: 12, overflow: "hidden" }}>
-        <div style={{ padding: 14, borderBottom: "1px solid #3333", fontWeight: 700 }}>Lead Pipeline</div>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-            <thead>
-              <tr style={{ textAlign: "left", background: "#00000008" }}>
-                <th style={thStyle}>Student</th>
-                <th style={thStyle}>Domain</th>
-                <th style={thStyle}>Goal</th>
-                <th style={thStyle}>Latest Recommendation</th>
-                <th style={thStyle}>Top Job Match</th>
-                <th style={thStyle}>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.leads.map((lead) => {
-                const top = lead.matches[0];
-                return (
-                  <tr key={lead.profile.id} style={{ borderTop: "1px solid #3332" }}>
-                    <td style={tdStyle}>
-                      <div style={{ fontWeight: 600 }}>{lead.profile.name ?? "Unnamed"}</div>
-                      <div style={{ opacity: 0.75, fontSize: 12 }}>{lead.profile.phone ?? "No phone"}</div>
-                    </td>
-                    <td style={tdStyle}>{displayDomain(lead.profile.interest_domain)}</td>
-                    <td style={tdStyle}>{displayText(lead.profile.career_goal)}</td>
-                    <td style={tdStyle}>{lead.recommendationTitle ?? "-"}</td>
-                    <td style={tdStyle}>
-                      {top ? `${top.job.title} @ ${top.job.company}` : "No match"}
-                    </td>
-                    <td style={tdStyle}>{top ? `${top.score}%` : "-"}</td>
-                  </tr>
-                );
-              })}
-              {data.leads.length === 0 && (
-                <tr>
-                  <td style={tdStyle} colSpan={6}>
-                    No student profiles found yet. Run profiling flow or use `sql/crm_mock_data.sql`.
-                  </td>
+        <section className={styles.section}>
+          <div className={styles.sectionHead}>Lead Pipeline</div>
+          <div className={styles.tableWrap}>
+            <table className={styles.table}>
+              <thead>
+                <tr className={styles.theadRow}>
+                  <th className={styles.th}>Student</th>
+                  <th className={styles.th}>Domain</th>
+                  <th className={styles.th}>Goal</th>
+                  <th className={styles.th}>Recommendation</th>
+                  <th className={styles.th}>Lead Score</th>
+                  <th className={styles.th}>Top Role Match</th>
+                  <th className={styles.th}>Match Score</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section style={{ marginTop: 20 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700 }}>Lead-to-Job Ranking</h2>
-        <div style={{ marginTop: 10, display: "grid", gap: 12 }}>
-          {data.leads.map((lead) => (
-            <div key={`${lead.profile.id}-matches`} style={{ border: "1px solid #3333", borderRadius: 12, padding: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 16 }}>{lead.profile.name ?? "Unnamed Student"}</div>
-                  <div style={{ fontSize: 13, opacity: 0.8 }}>
-                    {displayDomain(lead.profile.interest_domain)} | {displayText(lead.profile.current_status)} | {displayText(lead.profile.education_level)}
-                  </div>
-                </div>
-                <div style={{ fontSize: 13, opacity: 0.8 }}>
-                  Recommendation: {lead.recommendationTitle ?? "Not available"}
-                </div>
-              </div>
-
-              <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-                {lead.matches.slice(0, 3).map((match) => (
-                  <div
-                    key={`${lead.profile.id}-${match.job.id}`}
-                    style={{
-                      border: "1px solid #3332",
-                      borderRadius: 10,
-                      padding: 10,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      gap: 10,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontWeight: 600 }}>
-                        {match.job.title} @ {match.job.company}
-                      </div>
-                      <div style={{ fontSize: 13, opacity: 0.8 }}>
-                        {displayDomain(match.job.domain)} | {displayText(match.job.location)} | {displayText(match.job.salary_range)}
-                      </div>
-                      <div style={{ marginTop: 6, fontSize: 12, opacity: 0.75 }}>
-                        Why matched: {match.reasons.join(" | ")}
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 24, fontWeight: 700 }}>{match.score}%</div>
-                  </div>
-                ))}
-                {lead.matches.length === 0 && (
-                  <div style={{ fontSize: 13, opacity: 0.7 }}>
-                    No ranked job matches yet. Add mock jobs with `sql/crm_mock_data.sql`.
-                  </div>
+              </thead>
+              <tbody>
+                {data.leads.map((lead) => {
+                  const top = lead.matches[0];
+                  return (
+                    <tr key={lead.profile.id} className={styles.tr}>
+                      <td className={styles.td}>
+                        <div className={styles.strong}>{lead.profile.name ?? "Unnamed"}</div>
+                        <div className={styles.small}>{lead.profile.phone ?? "No phone"}</div>
+                      </td>
+                      <td className={styles.td}>{displayDomain(lead.profile.interest_domain)}</td>
+                      <td className={styles.td}>{displayText(lead.profile.career_goal)}</td>
+                      <td className={styles.td}>{lead.recommendationTitle ?? "-"}</td>
+                      <td className={styles.td}>{lead.leadScore}%</td>
+                      <td className={styles.td}>
+                        {top ? `${top.job.title} @ ${top.job.company}` : "No role fit yet"}
+                      </td>
+                      <td className={styles.td}>{top ? `${top.score}%` : "-"}</td>
+                    </tr>
+                  );
+                })}
+                {data.leads.length === 0 && (
+                  <tr>
+                    <td className={styles.td} colSpan={7}>
+                      No student profiles available yet.
+                    </td>
+                  </tr>
                 )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 className={styles.rankingTitle}>Lead-to-Role Ranking</h2>
+          <div className={styles.rankingGrid}>
+            {data.leads.map((lead) => (
+              <div key={`${lead.profile.id}-matches`} className={styles.leadCard}>
+                <div className={styles.leadHead}>
+                  <div>
+                    <div className={styles.leadName}>
+                      {lead.profile.name ?? "Unnamed Student"}
+                    </div>
+                    <div className={styles.leadMeta}>
+                      {displayDomain(lead.profile.interest_domain)} |{" "}
+                      {displayText(lead.profile.current_status)} |{" "}
+                      {displayText(lead.profile.education_level)}
+                    </div>
+                  </div>
+                  <div className={styles.leadMeta}>
+                    Profile Score: <strong>{lead.leadScore}%</strong>
+                  </div>
+                </div>
+
+                <div className={styles.matchList}>
+                  {lead.matches.slice(0, 5).map((match) => (
+                    <div
+                      key={`${lead.profile.id}-${match.job.id}`}
+                      className={styles.matchCard}
+                    >
+                      <div>
+                        <div className={styles.matchTitle}>
+                          {match.job.title} @ {match.job.company}
+                        </div>
+                        <div className={styles.matchMeta}>
+                          {displayDomain(match.job.domain)} |{" "}
+                          {displayText(match.job.location)} |{" "}
+                          {displayText(match.job.salary_range)}
+                        </div>
+                        <div className={styles.matchReason}>
+                          Why matched: {match.reasons.join(" | ")}
+                        </div>
+                      </div>
+                      <div className={styles.score}>{match.score}%</div>
+                    </div>
+                  ))}
+                  {lead.matches.length === 0 && (
+                    <div className={styles.empty}>No ranked role matches available yet.</div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <div className={styles.sectionHead}>Open Role Quality Scores</div>
+          <div className={styles.jobsGrid}>
+            {data.jobs.slice(0, 18).map((job) => (
+              <div key={job.id} className={styles.jobCard}>
+                <div className={styles.jobTitle}>{job.title}</div>
+                <div className={styles.jobMeta}>
+                  {job.company} | {displayDomain(job.domain)}
+                </div>
+                <div className={styles.jobMeta}>
+                  {displayText(job.location)} | {displayText(job.salary_range)}
+                </div>
+                <div className={styles.jobScore}>Role Score: {job.jobScore}%</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ border: "1px solid #3333", borderRadius: 12, padding: 14 }}>
-      <div style={{ fontSize: 12, opacity: 0.72 }}>{label}</div>
-      <div style={{ marginTop: 6, fontSize: 24, fontWeight: 700 }}>{value}</div>
+    <div className={styles.statCard}>
+      <div className={styles.statLabel}>{label}</div>
+      <div className={styles.statValue}>{value}</div>
     </div>
   );
 }
 
-const thStyle: React.CSSProperties = {
-  padding: "10px 12px",
-  borderBottom: "1px solid #3333",
-  fontSize: 12,
-  textTransform: "uppercase",
-  letterSpacing: "0.02em",
-  opacity: 0.8,
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: "10px 12px",
-  verticalAlign: "top",
-};
-
 async function loadCrmData(): Promise<{
   leads: LeadView[];
-  jobs: JobPostingRow[];
-  jobSource: string;
+  jobs: ScoredJob[];
   warning: string | null;
 }> {
   const supabase = getServerSupabase();
@@ -337,22 +335,23 @@ async function loadCrmData(): Promise<{
 
   let warning: string | null = null;
   let jobs: JobPostingRow[] = [];
-  let jobSource = "supabase";
 
   if (jobsRes.error) {
-    jobSource = "fallback mock";
     warning =
-      "Could not load `job_postings` from Supabase. Showing fallback mock jobs. Run `sql/crm_mock_data.sql` to enable DB-backed jobs.";
-    jobs = FALLBACK_JOBS;
+      "Role feed is initializing. Baseline role set is currently displayed.";
+    jobs = BASELINE_JOBS;
   } else {
     jobs = (jobsRes.data ?? []) as JobPostingRow[];
     if (jobs.length === 0) {
-      jobSource = "fallback mock";
       warning =
-        "No active job postings in Supabase yet. Showing fallback mock jobs. Run `sql/crm_mock_data.sql`.";
-      jobs = FALLBACK_JOBS;
+        "No active roles found yet. Baseline role set is currently displayed.";
+      jobs = BASELINE_JOBS;
     }
   }
+
+  const scoredJobs = jobs
+    .map((job) => ({ ...job, jobScore: scoreJobPosting(job) }))
+    .sort((a, b) => b.jobScore - a.jobScore);
 
   const latestRecByProfile = new Map<string, RecommendationRow>();
   for (const rec of recs) {
@@ -364,59 +363,65 @@ async function loadCrmData(): Promise<{
 
   const leads: LeadView[] = profiles.map((profile) => {
     const rec = latestRecByProfile.get(profile.id);
-    const matches = rankJobsForLead(profile, jobs, rec?.program_title ?? null);
+    const recommendationTitle = rec?.program_title ?? null;
+    const matches = rankJobsForLead(profile, scoredJobs, recommendationTitle);
+    const leadScore = computeLeadScore(
+      profile,
+      recommendationTitle,
+      matches[0]?.score ?? 0
+    );
     return {
       profile,
-      recommendationTitle: rec?.program_title ?? null,
+      recommendationTitle,
+      leadScore,
       matches,
     };
   });
 
-  return { leads, jobs, jobSource, warning };
+  return { leads, jobs: scoredJobs, warning };
 }
 
 function rankJobsForLead(
   profile: ProfileRow,
-  jobs: JobPostingRow[],
+  jobs: ScoredJob[],
   recommendationTitle: string | null
 ): RankedMatch[] {
   return jobs
     .map((job) => scoreLeadForJob(profile, job, recommendationTitle))
-    .filter((match) => match.score >= 25)
     .sort((a, b) => b.score - a.score)
     .slice(0, 5);
 }
 
 function scoreLeadForJob(
   profile: ProfileRow,
-  job: JobPostingRow,
+  job: ScoredJob,
   recommendationTitle: string | null
 ): RankedMatch {
-  let score = 0;
+  let score = Math.round(job.jobScore * 0.16);
   const reasons: string[] = [];
 
   const leadDomain = normalizeToken(profile.interest_domain);
   const jobDomain = normalizeToken(job.domain);
 
   if (leadDomain && leadDomain === jobDomain) {
-    score += 55;
+    score += 44;
     reasons.push("Strong domain match");
   } else if (isRelatedDomain(leadDomain, jobDomain)) {
-    score += 24;
-    reasons.push("Related domain");
+    score += 20;
+    reasons.push("Related domain alignment");
   }
 
   const status = normalizeToken(profile.current_status);
   const exp = normalizeToken(job.experience_level);
-  if (status === "job_seeker" && (exp === "entry" || exp === "junior")) {
+  if (status === "job seeker" && (exp === "entry" || exp === "junior")) {
     score += 16;
-    reasons.push("Entry-fit for job seeker");
+    reasons.push("Entry-fit for active job search");
   } else if (status === "student" && exp === "entry") {
     score += 12;
-    reasons.push("Student-friendly role level");
+    reasons.push("Student-friendly level");
   } else if (status === "working" && (exp === "junior" || exp === "mid")) {
-    score += 12;
-    reasons.push("Good switch/upskill level");
+    score += 10;
+    reasons.push("Strong upskill/switch fit");
   }
 
   const educationFitScore = computeEducationFit(
@@ -434,18 +439,93 @@ function scoreLeadForJob(
     profile.career_goal ?? "",
   ].join(" ");
   const profileTokens = tokenize(searchableProfileText);
-  const skills = (job.required_skills ?? []).flatMap((skill) => tokenize(skill));
-  const overlap = countOverlap(profileTokens, skills);
+  const jobTokens = tokenize(`${job.title} ${(job.required_skills ?? []).join(" ")}`);
+  const overlap = countOverlap(profileTokens, jobTokens);
   if (overlap > 0) {
-    const skillScore = Math.min(15, overlap * 5);
+    const skillScore = Math.min(14, overlap * 4);
     score += skillScore;
-    reasons.push(`Skill signal overlap (${overlap})`);
+    reasons.push(`Skill/intent overlap (${overlap})`);
+  }
+
+  if (normalizeToken(job.location).includes("remote")) {
+    score += 4;
+    reasons.push("Remote flexibility");
   }
 
   score = Math.max(0, Math.min(100, score));
-  if (reasons.length === 0) reasons.push("Baseline fit");
+  if (reasons.length === 0) reasons.push("General baseline fit");
 
   return { job, score, reasons };
+}
+
+function scoreJobPosting(job: JobPostingRow): number {
+  let score = 42;
+
+  const exp = normalizeToken(job.experience_level);
+  if (exp === "entry") score += 14;
+  if (exp === "junior") score += 10;
+  if (exp === "mid") score += 6;
+
+  const salaryTop = parseSalaryUpper(job.salary_range ?? "");
+  if (salaryTop >= 100000) score += 14;
+  else if (salaryTop >= 85000) score += 11;
+  else if (salaryTop >= 70000) score += 8;
+  else if (salaryTop > 0) score += 5;
+
+  const skillsCount = (job.required_skills ?? []).length;
+  if (skillsCount >= 4) score += 11;
+  else if (skillsCount >= 2) score += 7;
+  else if (skillsCount === 1) score += 4;
+
+  if (normalizeToken(job.location).includes("remote")) score += 8;
+  if (normalizeToken(job.job_type) === "full_time") score += 6;
+
+  if (DOMAIN_LABELS[job.domain]) score += 7;
+  if (job.is_active) score += 6;
+
+  return Math.max(0, Math.min(100, score));
+}
+
+function computeLeadScore(
+  profile: ProfileRow,
+  recommendationTitle: string | null,
+  topMatchScore: number
+): number {
+  const profileFields = [
+    profile.name,
+    profile.phone,
+    profile.education_level,
+    profile.current_status,
+    profile.interest_domain,
+    profile.career_goal,
+    profile.budget_range,
+  ];
+
+  const completion = profileFields.filter((value) => Boolean(value)).length;
+  let score = Math.round((completion / profileFields.length) * 55);
+
+  if (profile.specific_course) score += 8;
+  if (recommendationTitle) score += 20;
+  if (normalizeToken(profile.current_status) === "job seeker") score += 5;
+  score += Math.round(topMatchScore * 0.17);
+
+  return Math.max(0, Math.min(100, score));
+}
+
+function parseSalaryUpper(value: string): number {
+  const normalized = value.toLowerCase();
+  const matches = normalized.match(/\d+(?:\.\d+)?\s*k?/g) ?? [];
+  if (matches.length === 0) return 0;
+
+  const nums = matches.map((entry) => {
+    const trimmed = entry.trim();
+    const isK = trimmed.endsWith("k");
+    const n = Number.parseFloat(trimmed.replace("k", ""));
+    if (!Number.isFinite(n)) return 0;
+    return isK ? n * 1000 : n;
+  });
+
+  return Math.max(...nums, 0);
 }
 
 function computeEducationFit(lead: string, required: string): number {

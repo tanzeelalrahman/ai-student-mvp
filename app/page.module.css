@@ -1,0 +1,261 @@
+.page {
+  min-height: 100vh;
+  padding: 0 16px 44px;
+  background:
+    radial-gradient(circle at 8% 13%, #dce6ff 0, #dce6ff 20%, transparent 42%),
+    radial-gradient(circle at 90% 88%, #ffe5ef 0, #ffe5ef 24%, transparent 42%),
+    linear-gradient(160deg, #f6f8ff 0%, #eef3ff 58%, #fff5f9 100%);
+  color: #121433;
+  font-family: var(--font-geist-sans), "Avenir Next", "Segoe UI", sans-serif;
+}
+
+.shell {
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.topBar {
+  margin-top: 16px;
+  border-radius: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(90deg, #2f2ea6 0%, #2c2e91 100%);
+  color: #f5f6ff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.status {
+  border: 1px solid #7d7fe9;
+  background: #ffffff17;
+  color: #f2f3ff;
+  border-radius: 999px;
+  font-size: 12px;
+  padding: 6px 10px;
+  font-weight: 700;
+}
+
+.hero {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+}
+
+.heroMain {
+  border: 1px solid #c8cfff;
+  border-radius: 24px;
+  padding: 28px;
+  background: linear-gradient(160deg, #ffffffde 0%, #f4f7ff 100%);
+  box-shadow: 0 14px 38px #2f2ea61c;
+}
+
+.eyebrow {
+  display: inline-block;
+  border-radius: 999px;
+  border: 1px solid #cfd6ff;
+  background: #eef1ff;
+  color: #2a2c8f;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+}
+
+.title {
+  margin-top: 12px;
+  font-size: clamp(32px, 5vw, 58px);
+  line-height: 1.03;
+  letter-spacing: -0.03em;
+  color: #1b1f63;
+}
+
+.titleAccent {
+  color: #e91e63;
+}
+
+.subtitle {
+  margin-top: 12px;
+  max-width: 62ch;
+  line-height: 1.6;
+  color: #3e4679;
+}
+
+.ctaRow {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.primaryBtn {
+  text-decoration: none;
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #2f2ea6 0%, #21237d 100%);
+  box-shadow: 0 10px 26px #2f2ea647;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px #2f2ea654;
+}
+
+.secondaryBtn {
+  text-decoration: none;
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 800;
+  border: 1px solid #f05088;
+  background: linear-gradient(135deg, #ef2f72 0%, #d81b60 100%);
+  box-shadow: 0 10px 24px #d81b603d;
+}
+
+.heroSide {
+  border: 1px solid #ccd4ff;
+  border-radius: 24px;
+  padding: 20px;
+  background: linear-gradient(145deg, #eff2ff 0%, #fff5fa 100%);
+  box-shadow: 0 14px 34px #2f2ea619;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.sideTitle {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #1f236c;
+}
+
+.steps {
+  margin: 0;
+  padding-left: 18px;
+  color: #3a4174;
+  line-height: 1.5;
+}
+
+.pill {
+  border: 1px solid #d2b1c7;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  background: #ffffffcf;
+  color: #5a3761;
+  width: fit-content;
+}
+
+.metrics {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.metric {
+  border: 1px solid #c7cffd;
+  border-radius: 16px;
+  padding: 14px;
+  background: #ffffffd8;
+}
+
+.metricLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4f568f;
+}
+
+.metricValue {
+  margin-top: 6px;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #242778;
+}
+
+.cards {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.card {
+  border: 1px solid #ccd4ff;
+  border-radius: 16px;
+  padding: 14px;
+  background: #ffffffd9;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  color: #252878;
+}
+
+.card p {
+  margin: 8px 0 0;
+  color: #444d81;
+  line-height: 1.5;
+}
+
+@media (max-width: 940px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding-top: 0;
+  }
+
+  .topBar {
+    border-radius: 0 0 14px 14px;
+    margin-top: 0;
+  }
+
+  .heroMain,
+  .heroSide {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .ctaRow {
+    flex-direction: column;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    text-align: center;
+  }
+}

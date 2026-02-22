@@ -1,0 +1,287 @@
+.page {
+  min-height: 100vh;
+  padding: 0 16px 48px;
+  background:
+    radial-gradient(circle at 10% 12%, #dee7ff 0, #dee7ff 18%, transparent 40%),
+    radial-gradient(circle at 90% 84%, #ffe4ee 0, #ffe4ee 20%, transparent 42%),
+    linear-gradient(150deg, #f6f8ff 0%, #edf2ff 56%, #fff5f9 100%);
+  color: #161b45;
+  font-family: var(--font-geist-sans), "Avenir Next", "Segoe UI", sans-serif;
+}
+
+.shell {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.top {
+  margin-top: 16px;
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: linear-gradient(90deg, #2f2ea6 0%, #2b2d8f 100%);
+  color: #f3f4ff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: clamp(30px, 5vw, 48px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.subtitle {
+  margin-top: 8px;
+  color: #d8ddff;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.linkBtn {
+  padding: 10px 14px;
+  border: 1px solid #8587ec;
+  border-radius: 10px;
+  background: #ffffff1a;
+  color: #f5f6ff;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.stats {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.statCard {
+  border: 1px solid #c8ceff;
+  border-radius: 14px;
+  padding: 14px;
+  background: #ffffffde;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: #525a93;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  margin-top: 6px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #222673;
+}
+
+.warning {
+  margin-top: 14px;
+  color: #be2a5f;
+  font-weight: 700;
+}
+
+.section {
+  margin-top: 20px;
+  border: 1px solid #c6ccff;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffffdb;
+}
+
+.sectionHead {
+  padding: 14px;
+  border-bottom: 1px solid #3333;
+  font-weight: 800;
+  color: #25297a;
+  background: linear-gradient(100deg, #eef1ff 0%, #fff3f8 100%);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.theadRow {
+  text-align: left;
+  background: #f6f7ff;
+}
+
+.th {
+  padding: 10px 12px;
+  border-bottom: 1px solid #3333;
+  font-size: 12px;
+  color: #535a8f;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tr {
+  border-top: 1px solid #3332;
+}
+
+.td {
+  padding: 10px 12px;
+  vertical-align: top;
+  color: #2f346e;
+}
+
+.strong {
+  font-weight: 700;
+  color: #232775;
+}
+
+.small {
+  color: #5f6697;
+  font-size: 12px;
+}
+
+.rankingTitle {
+  margin-top: 20px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #232775;
+}
+
+.rankingGrid {
+  margin-top: 10px;
+  display: grid;
+  gap: 12px;
+}
+
+.leadCard {
+  border: 1px solid #c6ccff;
+  border-radius: 14px;
+  padding: 14px;
+  background: #ffffffdd;
+}
+
+.leadHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.leadName {
+  font-weight: 800;
+  font-size: 16px;
+  color: #24287a;
+}
+
+.leadMeta {
+  font-size: 13px;
+  color: #4a5288;
+}
+
+.matchList {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.matchCard {
+  border: 1px solid #cfd5ff;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: linear-gradient(140deg, #fafbff 0%, #fff5f9 100%);
+}
+
+.matchTitle {
+  font-weight: 700;
+  color: #242978;
+}
+
+.matchMeta {
+  font-size: 13px;
+  color: #535b8f;
+}
+
+.matchReason {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #626999;
+}
+
+.score {
+  font-size: 24px;
+  font-weight: 800;
+  color: #e91e63;
+}
+
+.empty {
+  font-size: 13px;
+  color: #5c6395;
+}
+
+.jobsGrid {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.jobCard {
+  border: 1px solid #ccd2ff;
+  border-radius: 12px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.jobTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: #252978;
+}
+
+.jobMeta {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #555c90;
+}
+
+.jobScore {
+  margin-top: 8px;
+  display: inline-block;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: linear-gradient(135deg, #ef2f72 0%, #d81b60 100%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+@media (max-width: 740px) {
+  .page {
+    padding-top: 0;
+  }
+
+  .top {
+    border-radius: 0 0 14px 14px;
+    margin-top: 0;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .linkBtn {
+    flex: 1;
+    text-align: center;
+  }
+}

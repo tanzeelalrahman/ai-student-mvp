@@ -71,7 +71,7 @@ type ParseResult<T> =
 
 const FLOW_KEY = "whatsapp_profile_flow";
 const FALLBACK_MESSAGE =
-  "Thanks for your message. We hit a temporary issue. Please reply again in a moment.";
+  "Thank you for contacting BHI Career Advisory. We are experiencing a temporary issue. Please reply again in a few moments.";
 
 const STEPS = [
   "name",
@@ -266,8 +266,8 @@ async function handleWebhook(req: Request): Promise<Response> {
     await persistState(supabase, conversation.id, conversation.metadata, state);
     return xmlResponse(
       [
-        "Profile reset.",
-        "Let's start again.",
+        "Your profile session has been reset.",
+        "Let's begin again.",
         promptForStep("name"),
       ].join("\n")
     );
@@ -306,7 +306,8 @@ async function handleWebhook(req: Request): Promise<Response> {
     await persistState(supabase, conversation.id, conversation.metadata, state);
     return xmlResponse(
       [
-        "Welcome. I will collect a few details and build your program recommendation.",
+        "Welcome to BHI Career Advisory.",
+        "I will collect a few details to prepare your personalized recommendation.",
         promptForStep("name"),
       ].join("\n")
     );
@@ -316,7 +317,7 @@ async function handleWebhook(req: Request): Promise<Response> {
   if (!body) {
     await persistState(supabase, conversation.id, conversation.metadata, state);
     return xmlResponse(
-      ["I did not catch that.", promptForStep(currentStep)].join("\n")
+      ["I did not receive your response.", promptForStep(currentStep)].join("\n")
     );
   }
 
@@ -573,7 +574,10 @@ function parseStepAnswer(
   if (step === "name") {
     const name = text.replace(/\s+/g, " ").trim();
     if (name.length < 2 || !/[a-z]/i.test(name)) {
-      return { ok: false, error: "Please share your full name (at least 2 letters)." };
+      return {
+        ok: false,
+        error: "Please share your full name (minimum 2 letters).",
+      };
     }
     return { ok: true, value: name.slice(0, 100) };
   }
@@ -584,7 +588,7 @@ function parseStepAnswer(
     if (!normalized) {
       return {
         ok: false,
-        error: "Please send a valid phone number or type 'skip'.",
+        error: "Please share a valid phone number, or reply 'Skip'.",
       };
     }
     return { ok: true, value: normalized };
@@ -632,7 +636,7 @@ function parseEnum<T extends string>(
   if (!matched) {
     return {
       ok: false,
-      error: `Please reply with a valid ${label} option number.`,
+      error: `Please choose one of the listed ${label} options by number.`,
     };
   }
 
@@ -640,15 +644,15 @@ function parseEnum<T extends string>(
 }
 
 function promptForStep(step: StepId): string {
-  if (step === "name") return "1/8 What is your name?";
+  if (step === "name") return "To begin, please share your full name.";
 
   if (step === "phone") {
-    return "2/8 What is your phone number? Reply with number or type 'skip'.";
+    return "Please share your phone number. You may reply 'Skip' if you prefer not to provide it.";
   }
 
   if (step === "education") {
     return [
-      "3/8 Education level (reply with number):",
+      "Please select your education level (reply with number):",
       "1) High school",
       "2) College / Undergraduate",
       "3) Graduate",
@@ -658,7 +662,7 @@ function promptForStep(step: StepId): string {
 
   if (step === "status") {
     return [
-      "4/8 Current status (reply with number):",
+      "Please select your current status (reply with number):",
       "1) Student",
       "2) Working",
       "3) Job seeker",
@@ -667,7 +671,7 @@ function promptForStep(step: StepId): string {
 
   if (step === "domain") {
     return [
-      "5/8 Interest domain (reply with number):",
+      "Please select your primary interest domain (reply with number):",
       "1) Web Development",
       "2) Data / AI",
       "3) Mobile",
@@ -680,7 +684,7 @@ function promptForStep(step: StepId): string {
 
   if (step === "goal") {
     return [
-      "6/8 Career goal (reply with number):",
+      "Please select your career goal (reply with number):",
       "1) Get a job fast",
       "2) Switch career",
       "3) Upskill in current role",
@@ -690,7 +694,7 @@ function promptForStep(step: StepId): string {
 
   if (step === "budget") {
     return [
-      "7/8 Budget range (reply with number):",
+      "Please select your budget range (reply with number):",
       "1) $0-$100",
       "2) $100-$300",
       "3) $300-$800",
@@ -698,7 +702,7 @@ function promptForStep(step: StepId): string {
     ].join("\n");
   }
 
-  return "8/8 Any specific course in mind? Reply with course name or type 'skip'.";
+  return "Do you have a specific course in mind? Reply with the course name, or 'Skip'.";
 }
 
 function normalizePhone(input: string): string | null {
@@ -1022,12 +1026,14 @@ function formatRecommendationMessage(
   ).slice(0, 4);
 
   const lines = [
-    isCached ? "Here is your saved recommendation:" : "Your recommendation is ready:",
+    isCached
+      ? "Welcome back. Here is your saved recommendation:"
+      : "Thank you. Your personalized recommendation is ready:",
     `Program: ${recommendation.programTitle}`,
-    "Timeline:",
+    "Timeline highlights:",
     ...bullets.map((item) => `- ${item}`),
-    `Job plan: ${recommendation.jobPlanSummary}`,
-    "Reply 'restart' if you want to profile again.",
+    `Career plan: ${recommendation.jobPlanSummary}`,
+    "Reply 'Restart' anytime to create a new profile.",
   ];
 
   return lines.join("\n");
